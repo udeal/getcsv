@@ -102,6 +102,6 @@ def main(search_term):
         time.sleep(1) #sleep 1 second
 
     # save records
-    df.to_csv('amz.csv')
+    df.to_csv('../amz.csv')
 
 main('lightning deals')
