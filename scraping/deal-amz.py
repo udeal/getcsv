@@ -69,7 +69,7 @@ def main(search_term):
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
     }
     
-    for page in range(1,6):
+    for page in range(1,4):
         url = get_url(search_term, page)
         response = requests.get(url)
         res = requests.get(url, headers=headers)
