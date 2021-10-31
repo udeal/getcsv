@@ -7,7 +7,7 @@ from urllib.parse import unquote
 
 SITE='www.amazon.ca'
 source = 'https://'+SITE+'/s?k=lightning+deals'
-categories = ['electronics', 'sporting', 'misc']
+categories = ['misc', 'smart-home', 'office-products', 'sporting',  'electronics']
 #categories = ['electronics', 'sporting']
 
 def get_url(term, sub, page):
@@ -71,7 +71,7 @@ def main(search_term):
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
     }
     for category in categories:
-        for page in range(1,4):
+        for page in range(1,3):
             url = get_url(search_term, category, page)
             print(url)
             response = requests.get(url)
@@ -102,7 +102,7 @@ def main(search_term):
                     df.loc[n, 'Source'] = source
                     n = n + 1
 
-            time.sleep(1) #sleep 1 second
+            time.sleep(5) #sleep 1 second
 
     # save records
     df.to_csv('../amz.csv')
