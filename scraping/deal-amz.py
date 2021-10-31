@@ -92,24 +92,19 @@ def main(search_term):
                 record = extract_record(item)
                 print(record)
                 if record is not None:
-                    if float(record[1]) >= float(record[2]):
-                        df.loc[n, 'Title'] = record[0]
-                        df.loc[n, 'Price'] = record[1]
-                        df.loc[n, 'Price_Origin'] = record[2]
-                        df.loc[n, 'Link'] = record[3]
-                        df.loc[n, 'Image'] = record[4]
-                        df.loc[n, 'Retailer'] = 'Amazon'
-                        df.loc[n, 'TimeStamp'] = now
-                        df.loc[n, 'Source'] = source
-                        df.loc[n, 'Delta'] = str(float(record[2]) - float(record[1]))
-                        n = n + 1
+                    df.loc[n, 'Title'] = record[0]
+                    df.loc[n, 'Price'] = record[1]
+                    df.loc[n, 'Price_Origin'] = record[2]
+                    df.loc[n, 'Link'] = record[3]
+                    df.loc[n, 'Image'] = record[4]
+                    df.loc[n, 'Retailer'] = 'Amazon'
+                    df.loc[n, 'TimeStamp'] = now
+                    df.loc[n, 'Source'] = source
+                    n = n + 1
 
             time.sleep(10) #sleep 1 second
 
     # save records
-    sorted_df = df.sort_values(by=["Delta"], ascending=False)
-    sorted_df.to_csv('../amz.csv', index=False)
-
-    df.to_csv('../amz2.csv')
+    df.to_csv('../amz.csv')
 
 main('lightning deals')
