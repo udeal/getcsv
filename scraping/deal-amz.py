@@ -8,7 +8,7 @@ from urllib.parse import unquote
 SITE='www.amazon.ca'
 source = 'https://'+SITE+'/s?k=lightning+deals'
 categories = ['misc', 'smart-home', 'office-products', 'sporting',  'electronics']
-#categories = ['electronics', 'sporting']
+#categories = ['smart-home']
 
 def get_url(term, sub, page):
     ts = int(time.time())   
@@ -55,7 +55,7 @@ def extract_record(item):
 
 def main(search_term):
     now = datetime.datetime.now().replace(microsecond=0).isoformat()
-    df = pd.DataFrame(columns = ['Title', 'Price', 'Price_Origin', 'Link', 'Image', 'Retailer', 'TimeStamp', 'Source'])
+    df = pd.DataFrame(columns = ['Title', 'Price', 'Price_Origin', 'Link', 'Image', 'Retailer', 'TimeStamp', 'Source', 'Delta'])
     n = 0
     headers = {
         'authority': SITE,
@@ -71,7 +71,7 @@ def main(search_term):
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
     }
     for category in categories:
-        for page in range(1,3):
+        for page in range(1,2):
             url = get_url(search_term, category, page)
             print(url)
             response = requests.get(url)
@@ -90,21 +90,26 @@ def main(search_term):
 
             for item in results:
                 record = extract_record(item)
-                #print(record)
+                print(record)
                 if record is not None:
-                    df.loc[n, 'Title'] = record[0]
-                    df.loc[n, 'Price'] = record[1]
-                    df.loc[n, 'Price_Origin'] = record[2]
-                    df.loc[n, 'Link'] = record[3]
-                    df.loc[n, 'Image'] = record[4]
-                    df.loc[n, 'Retailer'] = 'Amazon'
-                    df.loc[n, 'TimeStamp'] = now
-                    df.loc[n, 'Source'] = source
-                    n = n + 1
+                    if float(record[1]) >= float(record[2]):
+                        df.loc[n, 'Title'] = record[0]
+                        df.loc[n, 'Price'] = record[1]
+                        df.loc[n, 'Price_Origin'] = record[2]
+                        df.loc[n, 'Link'] = record[3]
+                        df.loc[n, 'Image'] = record[4]
+                        df.loc[n, 'Retailer'] = 'Amazon'
+                        df.loc[n, 'TimeStamp'] = now
+                        df.loc[n, 'Source'] = source
+                        df.loc[n, 'Delta'] = str(float(record[2]) - float(record[1]))
+                        n = n + 1
 
-            time.sleep(5) #sleep 1 second
+            time.sleep(10) #sleep 1 second
 
     # save records
-    df.to_csv('../amz.csv')
+    sorted_df = df.sort_values(by=["Delta"], ascending=False)
+    sorted_df.to_csv('../amz.csv', index=False)
+
+    df.to_csv('../amz2.csv')
 
 main('lightning deals')
