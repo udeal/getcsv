@@ -7,11 +7,12 @@ from urllib.parse import unquote
 
 SITE='www.amazon.ca'
 source = 'https://'+SITE+'/s?k=lightning+deals'
+categories = ['misc', 'electronics', 'sporting']
 
-def get_url(term, page):
+def get_url(term, sub, page):
     ts = int(time.time())   
     pg = str(page)
-    url = 'https://' + SITE + '/s?k='+ term.replace(' ','+') + '&page=' + pg + '&qid='+ str(ts) + '&ref=sr_pg_' + pg
+    url = 'https://' + SITE + '/s?k='+ term.replace(' ','+') + '&i=' + sub + '&page=' + pg + '&qid='+ str(ts) + '&ref=sr_pg_' + pg
     return url
 
 def extract_record(item):
@@ -68,38 +69,39 @@ def main(search_term):
         'sec-fetch-dest': 'document',
         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
     }
-    
-    for page in range(1,4):
-        url = get_url(search_term, page)
-        response = requests.get(url)
-        res = requests.get(url, headers=headers)
-        # Simple check to check if page was blocked (Usually 503)
-        if res.status_code > 500:
-            if "To discuss automated access to Amazon data please contact" in res.text:
-                print("Page %s was blocked by Amazon. Please try using better proxies\n"%url)
-            else:
-                print("Page %s must have been blocked by Amazon as the status code was %d"%(url,res.status_code))
-            return None
-        # Pass the HTML of the page and create 
+    for category in 
+        for page in range(1,4):
+            url = get_url(search_term, 'sporting', page)
+            print(url)
+            response = requests.get(url)
+            res = requests.get(url, headers=headers)
+            # Simple check to check if page was blocked (Usually 503)
+            if res.status_code > 500:
+                if "To discuss automated access to Amazon data please contact" in res.text:
+                    print("Page %s was blocked by Amazon. Please try using better proxies\n"%url)
+                else:
+                    print("Page %s must have been blocked by Amazon as the status code was %d"%(url,res.status_code))
+                return None
+            # Pass the HTML of the page and create 
 
-        soup = BeautifulSoup(res.text, 'html.parser')
-        results = soup.find_all('div', {'data-component-type': 's-search-result'})
+            soup = BeautifulSoup(res.text, 'html.parser')
+            results = soup.find_all('div', {'data-component-type': 's-search-result'})
 
-        for item in results:
-            record = extract_record(item)
-            #print(record)
-            if record is not None:
-                df.loc[n, 'Title'] = record[0]
-                df.loc[n, 'Price'] = record[1]
-                df.loc[n, 'Price_Origin'] = record[2]
-                df.loc[n, 'Link'] = record[3]
-                df.loc[n, 'Image'] = record[4]
-                df.loc[n, 'Retailer'] = 'Amazon'
-                df.loc[n, 'TimeStamp'] = now
-                df.loc[n, 'Source'] = source
-                n = n + 1
+            for item in results:
+                record = extract_record(item)
+                #print(record)
+                if record is not None:
+                    df.loc[n, 'Title'] = record[0]
+                    df.loc[n, 'Price'] = record[1]
+                    df.loc[n, 'Price_Origin'] = record[2]
+                    df.loc[n, 'Link'] = record[3]
+                    df.loc[n, 'Image'] = record[4]
+                    df.loc[n, 'Retailer'] = 'Amazon'
+                    df.loc[n, 'TimeStamp'] = now
+                    df.loc[n, 'Source'] = source
+                    n = n + 1
 
-        time.sleep(1) #sleep 1 second
+            time.sleep(5) #sleep 1 second
 
     # save records
     df.to_csv('../amz.csv')
